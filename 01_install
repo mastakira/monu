@@ -1,0 +1,110 @@
+I N S T A L L N I N G  G N U / L I N U X 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+TABLE OF CONTENT 
+  Create a bootable USB
+  BIOS
+  Installation
+  Partitioning
+  Create Bootable Live USB
+  Multiboot USB drive
+
+..- ... -... * ..- ... -... * ..- ... -... * ..- ... -... * ..- ... -... 
+C R E A T I N G  A  U S B 
+From windows we use Rufus:
+Default settings -> tap start -> download requirements -> Write in ISO image mode. 
+On older systems you might need to use the "bootia32.efi". Place it unde Boot/efi on the USB.
+
+From Linux we use _ _ _ _: 
+
+
+-... .. --- ... * -... .. --- ... * -... .. --- ... * -... .. --- ... 
+B I O S 
+Access bios (Del, F4, etc..). 
+Boot from usb using UEFI: 'usb drive'.  
+ 
+.-.. .. -. ..- .--. ~*~ .-.. .. -. ..- .--. 
+I N S T A L L I N G 
+*Always install Linux after Windows ** Use ext4 as your file system - One of the most stable and best in the world. *** Use linuxswap for the swap partition. 
+
+PARTITION TABLE
+  GPT - on newer system
+
+BOOT PARTITION - ("/boot, /boot/efi") Fat32
+  You do not need to have a /boot partition. However, it's good to have for flexibility reasons (LVM, encryption, BIOS limitations). 
+  "boot/efi" - 512 MiB first patrition. 
+  
+SWAP - ("swap") linuxswap
+  A partition used to augment your RAM, mounted and referred to as swap. Use 1.5-2 times the amount of sytem ram if you want to hybernate. But less is ok (4GB should do). 
+  16GB Ram = 16384MiB
+
+ROOT PARTITION - ("/") ext4
+  Check your distribution’s documentation, and reserve enough space for a maximum installation, plus at least 100MB more for temporary space and installation of new software. 
+  If you plan to download and try out lots of software, leave more space. If you have a small hard drive, you can trim back on your installed packages to save space.
+  12 - 20 GB partition for the OS. 
+  30 GiB = 30720 MiB
+
+HOME - ("/home") ext4
+  A larger partition for personal use, mounted as /home
+  100 GiB = 102400 MiB
+
+OPTIONAL: Recomended to make partitions after install. See Setup and Termilal doc. 
+  Create a partition for Timeshift and Desktop settings.
+  50 GiB = 51200 MiB 
+  You can also make a FAT32 partition which gives me a nice area to share files between Linux and Windows without worrying about one not being overly happy with NTFS and the other not being at all happy with EXT4.
+
+
+-... --- --- - .- -... .-.. .  .-.. .. ...- .  ..- ... -... 
+B O O T A B L E / L I V E  U S B :  
+
+Debian
+	Knopix
+	peppermint10
+Arch - https://wiki.archlinux.org/index.php/Install_Arch_Linux_on_a_USB_key
+	Manjaro Openbox- 
+	Manjaro XFCE - 
+Red Hat
+	Fedora Live USB - https://fedoraproject.org/wiki/FedoraLiveCD
+
+-    -    -    -    -    -    -    -    -    -    -    -    -    -    
+MANJARO 
+https://www.fosslinux.com/2404/installing-a-updatable-manjaro-linux-on-a-usb-flash-drive.htm
+
+Requirements
+A bootable Manjaro USB or CD, which is the installer in our case
+Another USB with at least 16 GB size that will be used to install Manjaro on it
+
+Partition type
+This one of the most critical steps, here you will be able to select the USB to install the MBR (Master Boot Record) on it. (Be careful; if you choose any other option than the USB, this definitely will cause an error later.)
+
+	NOTE: Pick MBR if you dont plane on going with the multi boot, see below. 
+	Manjaro efi guide - https://wiki.manjaro.org/index.php?title=UEFI_-_Install_Guide
+
+Create three partitions
+First partition is the “/boot/efi”. 
+The second partition is “/”. 
+The third partition is the "swap" partition. 
+
+
+-- ..- .-.. - .. -... --- --- - * -- ..- .-.. - .. -... --- --- - 
+M U L T I B O O T  U S B
+Hybrid UEFI GPT + BIOS GPT/MBR boot - https://wiki.archlinux.org/index.php/Multiboot_USB_drive
+This configuration is useful for creating a universal USB key, bootable everywhere. First of all you must create a GPT partition table on your device. You need at least 3 partitions:
+
+0.1 - A BIOS boot partition (gdisk type code EF02). This partition must be 1 MiB in size
+https://wiki.archlinux.org/index.php/GPT_fdisk
+
+	- - - - 
+	https://bbs.archlinux.org/viewtopic.php?id=169765
+	You only need a BIOS boot partition with a GPT partition table and you intend to use grub. I'm not clear if that is what you are using or not.
+
+	The BIOS boot partition doesn't get mounted and doesn't need formatting or a file system. It is just somewhere grub uses when it installs to disk and it finds it automatically.
+
+	If you want a regular boot partition, you need to create a separate partition for that with a regular file system type and of a reasonable size. ext4 is a perfectly good choice for /boot (I use it for my /boot) but you will need something bigger than 1MB!
+	- - - - 
+
+0.2 - An EFI System partition (gdisk type code EF00 with a FAT32 filesystem). This partition can be as small as 50 MiB.
+
+0.3 - Your data partition (use a filesystem supported by GRUB). This partition can take up the rest of the space of your drive.
+
+	NOTE: Flags was not important ?!
+
